@@ -1,1 +1,87 @@
 <P>this new repo</P>
+
+    <div class="topnav">
+        <a class="active" href="#">movies site</a>
+        <div class="search-container">
+            <form role="search" id="form">
+                <input type="search" id="query" name="q" placeholder="search..">
+                <button type="submit">Search</button>
+            </form>
+        </div>
+    </div>
+    <div style="padding-left:16px">
+        <section id="section">
+
+        </section>
+    </div>
+    <script>
+        const IMG_PATH = 'https://image.tmdb.org/t/p/w500';
+        const SEARCHAPI = "https://api.themoviedb.org/3/search/movie?api_key=243eb88472dda9d2ef8b67a2b339c31e&query=";
+        const APILINK = 'https://api.themoviedb.org/3/discover/movie?sort_by=popularity.desc&api_key=243eb88472dda9d2ef8b67a2b339c31e&page=1';
+
+        const main = document.getElementById('section');
+        const form = document.getElementById('form');
+        const searchInput = document.getElementById('query');
+
+        function displayVideoTrailer(videoKey) {
+            const videoContainer = document.createElement('div');
+            videoContainer.classList.add('video-container');
+
+            const videoIframe = document.createElement('iframe');
+            videoIframe.src = `https://www.youtube.com/embed/${videoKey}`;
+            videoIframe.allowFullscreen = true;
+
+            videoContainer.appendChild(videoIframe);
+            main.appendChild(videoContainer);
+        }
+
+        function returnMovies(url) {
+            fetch(url)
+                .then(res => res.json())
+                .then(data => {
+                    data.results.forEach(movie => {
+                        const movieCard = document.createElement('div');
+                        movieCard.classList.add('card');
+
+                        const movieImage = document.createElement('img');
+                        movieImage.classList.add('thumbnail');
+                        movieImage.src = IMG_PATH + movie.poster_path;
+
+                        const movieTitle = document.createElement('h3');
+                        movieTitle.textContent = movie.title;
+
+                        const watchTrailerButton = document.createElement('button');
+                        watchTrailerButton.textContent = 'Watch Trailer';
+                        watchTrailerButton.addEventListener('click', () => {
+                            // You'll need to fetch the video key from a different API or source
+                            // For demonstration purposes, let's assume the video key is "VIDEO_KEY"
+                            const VIDEO_KEY = 'VIDEO_KEY';
+                            displayVideoTrailer(VIDEO_KEY);
+                        });
+
+                        movieCard.appendChild(movieImage);
+                        movieCard.appendChild(movieTitle);
+                        movieCard.appendChild(watchTrailerButton);
+
+                        main.appendChild(movieCard);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching movies:', error);
+                });
+        }
+
+        form.addEventListener('submit', e => {
+            e.preventDefault();
+            main.innerHTML = '';
+            const searchTerm = searchInput.value;
+
+            if (searchTerm) {
+                returnMovies(SEARCHAPI + searchTerm);
+                searchInput.value = '';
+            }
+        });
+
+        returnMovies(APILINK); // Initial load
+    </script>
+
